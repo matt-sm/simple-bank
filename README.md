@@ -35,4 +35,4 @@ High-level solutions to some of these problems:
 - **Database Transactions/Sagas/Outbox Pattern**: these are all approaches either to ensure a single or distributed transaction completes in full or rolls back.
 - **Idempotency**: every operation should be idempotent and be able to be repeated without creating duplication within the system.
 - **Data Replication**: databases need to be replicated across availability zones and regions to ensure failures don't result in data loss
-- **Sharding**: sharding customers and accounts ensure load can be distributed across resouces
+- **Sharding**: sharding customers and accounts ensure load can be distributed across resources

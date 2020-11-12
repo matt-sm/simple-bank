@@ -16,9 +16,11 @@ class MoneyDeposited(DomainEvent):
 
     def trigger(self) -> str:
         bank = Bank.get(self._bank_id)
-        bank.deposit(self._amount)
         customer = Customer.get(self._customer_id)
-        customer.deposit(self._amount)
+        bank.balance += self._amount
+        customer.balance += self._amount
+        bank.save()
+        customer.save()
 
 
 class MoneyWithdrawn(DomainEvent):
@@ -29,6 +31,8 @@ class MoneyWithdrawn(DomainEvent):
 
     def trigger(self) -> str:
         bank = Bank.get(self._bank_id)
-        bank.withdraw(self._amount)
         customer = Customer.get(self._customer_id)
-        customer.withdraw(self._amount)
+        bank.balance -= self._amount
+        customer.balance -= self._amount
+        bank.save()
+        customer.save()

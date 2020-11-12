@@ -25,7 +25,7 @@ class AggregateType(Enum):
     ACCOUNT = 2
 
 
-class AggregateBase(ABC):
+class Aggregate(ABC):
     def __init__(self, name: str, type: str) -> None:
         self.id = uuid.uuid1()
         self.name = name
@@ -33,25 +33,11 @@ class AggregateBase(ABC):
         self.type = type
         self.save()
 
-    def withdraw(self, amount: int) -> None:
-        if valid_amount(amount) and self.balance >= amount:
-            self.balance -= amount
-            self.save()
-        else:
-            raise InsufficientFunds
-
-    def deposit(self, amount: int) -> None:
-        if valid_amount(amount) and self.balance + amount <= MAX_BALANCE:
-            self.balance += amount
-            self.save()
-        else:
-            raise AccountSizeExceeded
-
     def save(self) -> None:
         data[self.type][self.id] = self
 
 
-class Bank(AggregateBase):
+class Bank(Aggregate):
     def __init__(self, name: str) -> None:
         super(Bank, self).__init__(name, AggregateType.BANK)
 
@@ -60,7 +46,7 @@ class Bank(AggregateBase):
         return data[AggregateType.BANK][id]
 
 
-class Account(AggregateBase):
+class Account(Aggregate):
     def __init__(self, bank_id: str, customer_id: str, name: str):
         self.bank_id = bank_id
         self.customer_id = customer_id
@@ -70,8 +56,27 @@ class Account(AggregateBase):
     def get(cls, id: int):
         return data[AggregateType.ACCOUNT][id]
 
+    def valid_amount(self, amount: int) -> bool:
+        if not (amount > 0 and amount <= MAX_TRANSACTION):
+            raise InvalidAmount
+        return True
 
-class Customer(AggregateBase):
+    def withdraw(self, amount: int) -> None:
+        if self.valid_amount(amount) and self.balance >= amount:
+            self.balance -= amount
+            self.save()
+        else:
+            raise InsufficientFunds
+
+    def deposit(self, amount: int) -> None:
+        if self.valid_amount(amount) and self.balance + amount <= MAX_BALANCE:
+            self.balance += amount
+            self.save()
+        else:
+            raise AccountSizeExceeded
+
+
+class Customer(Aggregate):
     def __init__(self, bank_id: str, name: str):
         self.bank_id = bank_id
         super(Customer, self).__init__(name, AggregateType.CUSTOMER)
@@ -79,12 +84,6 @@ class Customer(AggregateBase):
     @classmethod
     def get(cls, id):
         return data[AggregateType.CUSTOMER][id]
-
-
-def valid_amount(amount: int) -> bool:
-    if not (amount > 0 and amount <= MAX_TRANSACTION):
-        raise InvalidAmount
-    return True
 
 
 # simulate persistence
