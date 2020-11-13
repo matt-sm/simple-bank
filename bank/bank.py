@@ -1,5 +1,6 @@
 from bank.commands import OpenBank, RegisterCustomer, OpenAccount, DepositMoney, WithdrawMoney
 from bank.queries import GetAccountBalance, GetBankBalance, GetCustomerBalance
+from bank.value_objects import Amount
 
 
 def open_bank(name: str) -> str:
@@ -17,12 +18,12 @@ def open_account(customer_id: str, account_name: str) -> str:
     return command.execute()
 
 
-def deposit_money(account_id: str, amount: int) -> None:
+def deposit_money(account_id: str, amount: Amount) -> None:
     command = DepositMoney(account_id, amount)
     return command.execute()
 
 
-def withdraw_money(account_id: str, amount: int) -> None:
+def withdraw_money(account_id: str, amount: Amount) -> None:
     command = WithdrawMoney(account_id, amount)
     return command.execute()
 

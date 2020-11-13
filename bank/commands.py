@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from bank.domain import Bank, Customer, Account
 from bank.events import MoneyDeposited, MoneyWithdrawn
+from bank.value_objects import Amount
 
 
 class InvalidName(Exception):
@@ -44,7 +45,7 @@ class OpenAccount(Command):
 
 
 class DepositMoney(Command):
-    def __init__(self, account_id: str, amount: int) -> None:
+    def __init__(self, account_id: str, amount: Amount) -> None:
         self._account_id = account_id
         self._amount = amount
 
@@ -58,7 +59,7 @@ class DepositMoney(Command):
 
 
 class WithdrawMoney(Command):
-    def __init__(self, account_id: str, amount: int) -> None:
+    def __init__(self, account_id: str, amount: Amount) -> None:
         self._account_id = account_id
         self._amount = amount
 

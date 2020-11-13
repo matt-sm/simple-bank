@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from bank.domain import Bank, Customer
+from bank.value_objects import Amount
 
 
 class DomainEvent(ABC):
@@ -9,7 +10,7 @@ class DomainEvent(ABC):
 
 
 class MoneyDeposited(DomainEvent):
-    def __init__(self, bank_id: str, customer_id, amount: int) -> None:
+    def __init__(self, bank_id: str, customer_id: str, amount: Amount) -> None:
         self._bank_id = bank_id
         self._customer_id = customer_id
         self._amount = amount
@@ -24,7 +25,7 @@ class MoneyDeposited(DomainEvent):
 
 
 class MoneyWithdrawn(DomainEvent):
-    def __init__(self, bank_id: str, customer_id, amount: int) -> None:
+    def __init__(self, bank_id: str, customer_id: str, amount: Amount) -> None:
         self._bank_id = bank_id
         self._customer_id = customer_id
         self._amount = amount
