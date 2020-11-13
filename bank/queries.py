@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from domain import Bank, Customer, Account
+from bank.domain import Bank, Customer, Account
 
 
 class Query(ABC):

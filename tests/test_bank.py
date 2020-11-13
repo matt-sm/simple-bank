@@ -1,5 +1,5 @@
 import unittest
-from bank import (
+from bank.bank import (
     open_bank,
     register_customer,
     open_account,

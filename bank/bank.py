@@ -1,5 +1,5 @@
-from commands import OpenBank, RegisterCustomer, OpenAccount, DepositMoney, WithdrawMoney
-from queries import GetAccountBalance, GetBankBalance, GetCustomerBalance
+from bank.commands import OpenBank, RegisterCustomer, OpenAccount, DepositMoney, WithdrawMoney
+from bank.queries import GetAccountBalance, GetBankBalance, GetCustomerBalance
 
 
 def open_bank(name: str) -> str:

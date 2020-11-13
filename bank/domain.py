@@ -1,7 +1,7 @@
 import uuid
 from abc import ABC
 from enum import Enum
-
+from bank.value_objects import Name
 
 MAX_TRANSACTION = 10 ** 6
 MAX_BALANCE = 10 ** 8
@@ -28,7 +28,7 @@ class AggregateType(Enum):
 class Aggregate(ABC):
     def __init__(self, name: str, type: str) -> None:
         self.id = uuid.uuid1()
-        self.name = name
+        self.name = Name(name)
         self.balance = 0
         self.type = type
         self.save()

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from domain import Bank, Customer, Account
-from events import MoneyDeposited, MoneyWithdrawn
+from bank.domain import Bank, Customer, Account
+from bank.events import MoneyDeposited, MoneyWithdrawn
 
 
 class InvalidName(Exception):
@@ -15,8 +15,6 @@ class Command(ABC):
 
 class OpenBank(Command):
     def __init__(self, bank_name: str) -> None:
-        if len(bank_name) == 0:
-            raise InvalidName
         self._bank_name = bank_name
 
     def execute(self) -> str:
@@ -26,9 +24,6 @@ class OpenBank(Command):
 
 class RegisterCustomer(Command):
     def __init__(self, bank_id: str, customer_name: str) -> None:
-        if len(customer_name) == 0:
-            raise InvalidName
-
         self._bank_id = bank_id
         self._customer_name = customer_name
 
@@ -39,9 +34,6 @@ class RegisterCustomer(Command):
 
 class OpenAccount(Command):
     def __init__(self, customer_id: str, account_name: str) -> None:
-        if len(account_name) == 0:
-            raise InvalidName
-
         self._customer_id = customer_id
         self._account_name = account_name
 
