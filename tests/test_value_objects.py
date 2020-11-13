@@ -1,6 +1,7 @@
 import unittest
+import uuid
 from dataclasses import FrozenInstanceError
-from bank.value_objects import Name, Amount, InvalidNameError, InvalidAmountError
+from bank.value_objects import Name, Amount, InvalidNameError, InvalidAmountError, UniqueEntityId
 
 
 class TestValueObjects(unittest.TestCase):
@@ -40,3 +41,10 @@ class TestValueObjects(unittest.TestCase):
 
         self.assertEqual(amount2 >= amount1, True)
         self.assertEqual(amount1 >= amount2, False)
+
+    def test_unique_entity_id(self):
+        test_id = UniqueEntityId()
+        uuid.UUID(str(test_id.id))
+
+        with self.assertRaises(FrozenInstanceError):
+            test_id.id = uuid.uuid1()

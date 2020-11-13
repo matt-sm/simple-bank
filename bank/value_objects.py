@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+import uuid
 
 
 class InvalidNameError(Exception):
@@ -36,3 +37,8 @@ class Amount:
 
     def __ge__(self, other):
         return self.value >= other.value
+
+
+@dataclass(frozen=True)
+class UniqueEntityId:
+    id: str = uuid.uuid1()
