@@ -41,4 +41,4 @@ class Amount:
 
 @dataclass(frozen=True)
 class UniqueEntityId:
-    id: str = uuid.uuid1()
+    value: str = uuid.uuid1()

@@ -1,7 +1,6 @@
-import uuid
 from abc import ABC
 from enum import Enum
-from bank.value_objects import Name, Amount
+from bank.value_objects import Name, Amount, UniqueEntityId
 
 MAX_TRANSACTION = 10 ** 6
 MAX_BALANCE = 10 ** 8
@@ -27,14 +26,14 @@ class AggregateType(Enum):
 
 class Aggregate(ABC):
     def __init__(self, name: Name, type: AggregateType) -> None:
-        self.id = uuid.uuid1()
+        self.id = UniqueEntityId()
         self.name = name
         self.balance = Amount(0)
         self.type = type
         self.save()
 
     def save(self) -> None:
-        data[self.type][self.id] = self
+        data[self.type][self.id.value] = self
 
 
 class Bank(Aggregate):
@@ -42,19 +41,19 @@ class Bank(Aggregate):
         super(Bank, self).__init__(name, AggregateType.BANK)
 
     @classmethod
-    def get(cls, id: int):
-        return data[AggregateType.BANK][id]
+    def get(cls, id: UniqueEntityId):
+        return data[AggregateType.BANK][id.value]
 
 
 class Account(Aggregate):
-    def __init__(self, bank_id: str, customer_id: str, name: Name):
+    def __init__(self, bank_id: UniqueEntityId, customer_id: UniqueEntityId, name: Name):
         self.bank_id = bank_id
         self.customer_id = customer_id
         super(Account, self).__init__(name, AggregateType.ACCOUNT)
 
     @classmethod
-    def get(cls, id: int):
-        return data[AggregateType.ACCOUNT][id]
+    def get(cls, id: UniqueEntityId):
+        return data[AggregateType.ACCOUNT][id.value]
 
     def withdraw(self, amount: Amount) -> None:
         if self.balance >= amount:
@@ -73,13 +72,13 @@ class Account(Aggregate):
 
 
 class Customer(Aggregate):
-    def __init__(self, bank_id: str, name: Name):
+    def __init__(self, bank_id: UniqueEntityId, name: Name):
         self.bank_id = bank_id
         super(Customer, self).__init__(name, AggregateType.CUSTOMER)
 
     @classmethod
-    def get(cls, id):
-        return data[AggregateType.CUSTOMER][id]
+    def get(cls, id: UniqueEntityId):
+        return data[AggregateType.CUSTOMER][id.value]
 
 
 # simulate persistence

@@ -44,7 +44,7 @@ class TestValueObjects(unittest.TestCase):
 
     def test_unique_entity_id(self):
         test_id = UniqueEntityId()
-        uuid.UUID(str(test_id.id))
+        uuid.UUID(str(test_id.value))
 
         with self.assertRaises(FrozenInstanceError):
-            test_id.id = uuid.uuid1()
+            test_id.value = uuid.uuid1()
