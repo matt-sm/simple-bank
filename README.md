@@ -21,9 +21,6 @@ The code follows a simplified Command/Query structure.  Domain events are used f
 - Maximum deposit value is $10^6
 - Maximum account balance is $10^8
 
-### Testing
-Rather than unit testing every class I created integration tests to exercise end-to-end scenarios.
-
 ### Additional thoughts
 Some elements of a banking app that are beyond scope:
 - **Consistency**: One of the most important aspects of a banking system is that account balances are consistent.  Every operation typically requires at least two updates: one to debit the source and another to credit the destination account. If a process dies after the debit the system could be left in an inconsistent state.
