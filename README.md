@@ -1,11 +1,11 @@
-Hi Code Reviewer, thanks for taking the time to review my solution.
+A DDD model for a simplified bank domain.
 
 The code has been built using the Python 3.8 standard library.  There are no extra dependencies.
 
 **To run the tests:** `python3 -m unittest`
 
 ### Process 
-To start the exercise, I did a brief event storming session to try an tease out the commands, aggregates and views:
+I did a brief event storming session to try an tease out the commands, aggregates and views:
 
 ![alt text](EventStorming.jpg "Event Storming")
 
@@ -25,7 +25,7 @@ The code follows a simplified Command/Query structure.  Domain events are used f
 Rather than unit testing every class I created integration tests to exercise end-to-end scenarios.
 
 ### Additional thoughts
-Some elements of a banking app that are beyond a 2 hour exercise:
+Some elements of a banking app that are beyond scope:
 - **Consistency**: One of the most important aspects of a banking system is that account balances are consistent.  Every operation typically requires at least two updates: one to debit the source and another to credit the destination account. If a process dies after the debit the system could be left in an inconsistent state.
 - **Resiliency**: Operations to transfer money may succeed, but the response to the client could fail due to network issues.  The client could be lead to believe the transfer did *not* succeed and retry, leading to duplicate transfers.
 - **Durability**: What happens if the database containing all the account details fails?  Would the bank lose everyone's money?

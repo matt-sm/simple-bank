@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from bank.domain import Bank, Customer
-from bank.value_objects import Amount
+from bank.repos import BankRepo, CustomerRepo
+from bank.value_objects import Amount, UniqueEntityId
 
 
 class DomainEvent(ABC):
@@ -10,30 +10,33 @@ class DomainEvent(ABC):
 
 
 class MoneyDeposited(DomainEvent):
-    def __init__(self, bank_id: str, customer_id: str, amount: Amount) -> None:
+    def __init__(self, bank_id: UniqueEntityId, customer_id: UniqueEntityId, amount: Amount) -> None:
         self._bank_id = bank_id
         self._customer_id = customer_id
         self._amount = amount
 
-    def trigger(self) -> str:
-        bank = Bank.get(self._bank_id)
-        customer = Customer.get(self._customer_id)
-        bank.balance += self._amount
-        customer.balance += self._amount
-        bank.save()
-        customer.save()
+    def trigger(self) -> None:
+        bank = BankRepo.findById(self._bank_id)
+        customer = CustomerRepo.findById(self._customer_id)
+
+        customer.increase_balance(self._amount)
+        bank.increase_balance(self._amount)
+
+        CustomerRepo.save(customer)
+        BankRepo.save(bank)
 
 
 class MoneyWithdrawn(DomainEvent):
-    def __init__(self, bank_id: str, customer_id: str, amount: Amount) -> None:
+    def __init__(self, bank_id: UniqueEntityId, customer_id: UniqueEntityId, amount: Amount) -> None:
         self._bank_id = bank_id
         self._customer_id = customer_id
         self._amount = amount
 
-    def trigger(self) -> str:
-        bank = Bank.get(self._bank_id)
-        customer = Customer.get(self._customer_id)
-        bank.balance -= self._amount
-        customer.balance -= self._amount
-        bank.save()
-        customer.save()
+    def trigger(self) -> None:
+        bank = BankRepo.findById(self._bank_id)
+        customer = CustomerRepo.findById(self._customer_id)
+        customer.decrease_balance(self._amount)
+        bank.decrease_balance(self._amount)
+
+        CustomerRepo.save(customer)
+        BankRepo.save(bank)

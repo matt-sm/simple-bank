@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
-from bank.domain import Bank, Customer, Account
+from bank.domain import Bank, Customer, Account, Aggregate
 from bank.events import MoneyDeposited, MoneyWithdrawn
 from bank.value_objects import Amount, UniqueEntityId, Name
+from bank.dtos import OpenAccountDto, TransferMoneyDto, RegisterCustomerDto, OpenBankDto
+from bank.repos import AccountRepo, CustomerRepo, BankRepo
 
 
 class InvalidName(Exception):
@@ -10,63 +12,65 @@ class InvalidName(Exception):
 
 class Command(ABC):
     @abstractmethod
-    def execute(self) -> None:
+    def execute(self) -> Aggregate:
         pass
 
 
 class OpenBank(Command):
-    def __init__(self, bank_name: Name) -> None:
-        self._bank_name = bank_name
+    def __init__(self, request: OpenBankDto) -> None:
+        self._request = request
 
-    def execute(self) -> UniqueEntityId:
-        bank = Bank(self._bank_name)
-        return bank.id
+    def execute(self) -> Bank:
+        bank = Bank(Name(self._request.bank_name))
+        BankRepo.save(bank)
+        return bank
 
 
 class RegisterCustomer(Command):
-    def __init__(self, bank_id: UniqueEntityId, customer_name: Name) -> None:
-        self._bank_id = bank_id
-        self._customer_name = customer_name
+    def __init__(self, request: RegisterCustomerDto) -> None:
+        self._request = request
 
-    def execute(self) -> UniqueEntityId:
-        customer = Customer(self._bank_id, self._customer_name)
-        return customer.id
+    def execute(self) -> Customer:
+        customer = Customer(UniqueEntityId(self._request.bank_id), Name(self._request.customer_name))
+        CustomerRepo.save(customer)
+        return customer
 
 
 class OpenAccount(Command):
-    def __init__(self, customer_id: UniqueEntityId, account_name: Name) -> None:
-        self._customer_id = customer_id
-        self._account_name = account_name
+    def __init__(self, request: OpenAccountDto) -> None:
+        self._request = request
 
-    def execute(self) -> UniqueEntityId:
-        customer = Customer.get(self._customer_id)
-        account = Account(customer.bank_id, self._customer_id, self._account_name)
-        return account.id
+    def execute(self) -> Account:
+        account = Account(
+            UniqueEntityId(self._request.bank_id),
+            UniqueEntityId(self._request.customer_id),
+            Name(self._request.account_name),
+        )
+        AccountRepo.save(account)
+        return account
 
 
 class DepositMoney(Command):
-    def __init__(self, account_id: UniqueEntityId, amount: Amount) -> None:
-        self._account_id = account_id
-        self._amount = amount
+    def __init__(self, request: TransferMoneyDto) -> None:
+        self._request = request
 
-    def execute(self) -> None:
-        account = Account.get(self._account_id)
-        account.deposit(self._amount)
+    def execute(self) -> Account:
+        account = AccountRepo.findById(UniqueEntityId(self._request.account_id))
+        account.deposit(Amount(self._request.amount))
 
-        event = MoneyDeposited(account.bank_id, account.customer_id, self._amount)
+        event = MoneyDeposited(account.bank_id, account.customer_id, Amount(self._request.amount))
         event.trigger()
-        return
+        return account
 
 
 class WithdrawMoney(Command):
-    def __init__(self, account_id: UniqueEntityId, amount: Amount) -> None:
-        self._account_id = account_id
-        self._amount = amount
+    def __init__(self, request: TransferMoneyDto) -> None:
+        self._request = request
 
-    def execute(self) -> None:
-        account = Account.get(self._account_id)
-        account.withdraw(self._amount)
+    def execute(self) -> Account:
+        account = AccountRepo.findById(UniqueEntityId(self._request.account_id))
+        account.withdraw(Amount(self._request.amount))
 
-        event = MoneyWithdrawn(account.bank_id, account.customer_id, self._amount)
+        event = MoneyWithdrawn(account.bank_id, account.customer_id, Amount(self._request.amount))
         event.trigger()
-        return
+        return account
